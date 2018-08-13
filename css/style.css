@@ -1,0 +1,51 @@
+:root {
+  --primary-color: #222222;
+  --secondary-color: #ece7ee;
+  --neutral-color: #e9a95b;
+}
+
+body {
+  background-color: var(--neutral-color);
+  font-family: "Orbitron", Lato, "PT Sans", -apple-system, BlinkMacSystemFont,
+    Roboto, Ubuntu, "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+}
+
+.main {
+  background-color: var(--secondary-color);
+  display: grid;
+  grid-template-columns: 1fr 2fr 2fr 1fr;
+  grid-template-rows: 1fr 2fr 2fr 1fr;
+  grid-gap: 0.4rem;
+  height: 100vh;
+  width: 100vw;
+}
+
+@media screen and (min-width: 22rem) {
+  .wrapper {
+    width: 70%;
+  }
+}
+
+html {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body,
+div,
+p,
+button {
+  margin: 0;
+  padding: 0;
+}
+
+*:focus {
+  outline: none;
+}
