@@ -10,7 +10,7 @@ As an analyst, I want to provide user with the result only after 25 selections, 
 
 As an analyst, I want to see clickrate for each picture, so that I can have a top list of choices.
 
-As an analyst, I want to see click-to-show ratio of for each picture, so that I my choice of the leader will be unbiased.
+As an analyst, I want to see click-through rate of for each picture, so that I my choice of the leader will be unbiased.
 
 As a user, I want to see pictures of different product in different combinations on my computer screen so that I can choose which one I like the most.
 
