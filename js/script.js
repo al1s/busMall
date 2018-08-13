@@ -44,20 +44,18 @@ var productsToAdd = [
 ];
 
 function Product(filename) {
-  this.name = this.getName(filename);
+  this.name = getName(filename);
   this.filename = filename;
   this.clicks = 0;
-  this.ctr = 0;
+  this.shown = 0;
 }
 
-Product.prototype.getName = function(src) {
+function getName(src) {
   return src.split('.')[0];
-};
+}
 Product.prototype.toString = function productToString() {
   return this.name;
 };
-
-productsToAdd.forEach(elm => (products[elm] = new Product(elm)));
 
 function randomRange(arr) {
   return Math.floor(Math.random() * arr.length);
@@ -81,6 +79,7 @@ function chooseRandom(productsToShow, skipList, products) {
 function Quiz(randomProducts) {
   randomProducts.forEach(elm => {
     this[elm.toString()] = elm;
+    products[elm.toString()].shown += 1;
   });
 }
 
@@ -91,9 +90,10 @@ Quiz.prototype.addDomElm = function addDom() {
     var label = document.createElement('label');
     var img = document.createElement('img');
     input.type = 'radio';
-    input.name = productName;
+    input.name = 'quizRadio';
     input.id = productName;
     input.className = 'input  input__quiz';
+    input.dataset.imgFilename = product.filename;
     label.for = input.id;
     label.appendChild(input);
     img.src = `img/${product.filename}`;
@@ -101,3 +101,30 @@ Quiz.prototype.addDomElm = function addDom() {
     this[product.toString()].DOMElm = label;
   });
 };
+
+Quiz.prototype.render = function initialRender(destination) {
+  while (destination.firstChild) {
+    destination.removeChild(destination.firstChild);
+  }
+  Object.keys(this).forEach(productName => {
+    destination.appendChild(this[productName].DOMElm);
+  });
+};
+
+function handleClick(e) {
+  var chosenPicture = e.target.dataset.imgFilename;
+  products[getName(chosenPicture)].clicks += 1;
+  var productListForQuiz = chooseRandom(productsToShow, [], products);
+  var currentQuiz = new Quiz(productListForQuiz);
+  currentQuiz.addDomElm();
+  currentQuiz.render(app);
+}
+
+var app = document.getElementById('appForm');
+app.addEventListener('input', handleClick);
+
+productsToAdd.forEach(elm => (products[getName(elm)] = new Product(elm)));
+var productListForQuiz = chooseRandom(productsToShow, [], products);
+var currentQuiz = new Quiz(productListForQuiz);
+currentQuiz.addDomElm();
+currentQuiz.render(app);
