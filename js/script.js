@@ -20,7 +20,6 @@
 var productsToShow = 3;
 var numberOfRounds = 25;
 var products = {};
-var quiz = {};
 var productsToAdd = [
   'bag.jpg',
   'banana.jpg',
@@ -45,13 +44,17 @@ var productsToAdd = [
 ];
 
 function Product(filename) {
+  this.name = this.getName(filename);
   this.filename = filename;
   this.clicks = 0;
   this.ctr = 0;
 }
 
+Product.prototype.getName = function(src) {
+  return src.split('.')[0];
+};
 Product.prototype.toString = function productToString() {
-  return this.filename;
+  return this.name;
 };
 
 productsToAdd.forEach(elm => (products[elm] = new Product(elm)));
@@ -67,7 +70,6 @@ function chooseRandom(productsToShow, skipList, products) {
   for (let i = 0; i < productsToShow; i++) {
     do {
       var randomNumberRange = randomRange(arr);
-      console.log(randomNumberRange);
       var randomProduct = products[arr[randomNumberRange]];
     } while (skip.includes(randomProduct.toString()));
     result.push(randomProduct);
@@ -75,3 +77,27 @@ function chooseRandom(productsToShow, skipList, products) {
   }
   return result;
 }
+
+function Quiz(randomProducts) {
+  randomProducts.forEach(elm => {
+    this[elm.toString()] = elm;
+  });
+}
+
+Quiz.prototype.addDomElm = function addDom() {
+  Object.keys(this).forEach(productName => {
+    var product = this[productName];
+    var input = document.createElement('input');
+    var label = document.createElement('label');
+    var img = document.createElement('img');
+    input.type = 'radio';
+    input.name = productName;
+    input.id = productName;
+    input.className = 'input  input__quiz';
+    label.for = input.id;
+    label.appendChild(input);
+    img.src = `img/${product.filename}`;
+    label.appendChild(img);
+    this[product.toString()].DOMElm = label;
+  });
+};
