@@ -56,6 +56,7 @@ function getName(src) {
 Product.prototype.toString = function productToString() {
   return this.name;
 };
+Product.prototype.renderProduct = renderProduct;
 
 function randomRange(arr) {
   return Math.floor(Math.random() * arr.length);
@@ -102,29 +103,97 @@ Quiz.prototype.addDomElm = function addDom() {
   });
 };
 
-Quiz.prototype.render = function initialRender(destination) {
-  while (destination.firstChild) {
-    destination.removeChild(destination.firstChild);
-  }
+Quiz.prototype.update = function initialRender(destination) {
+  clearElm(destination);
   Object.keys(this).forEach(productName => {
     destination.appendChild(this[productName].DOMElm);
   });
 };
 
+function clearElm(elm) {
+  while (elm.firstChild) {
+    elm.removeChild(elm.firstChild);
+  }
+}
+//=======================================
+function createElmWithContent(elmName, elmClass, content) {
+  var elm = document.createElement(elmName);
+  elm.className = elmClass;
+  elm.textContent = content;
+  return elm;
+}
+
+function renderProduct(target) {
+  var row = createElmWithContent('tr', 'table__body  row');
+  row.appendChild(createElmWithContent('th', 'header__cell', this.name));
+  row.appendChild(createElmWithContent('td', 'body__cell', this.clicks));
+  row.appendChild(createElmWithContent('td', 'body__cell', this.shown));
+  return row;
+}
+
+function renderHeader(headerElmList) {
+  var headerDeclaration = createElmWithContent('thead', 'table__header');
+  var headerRow = createElmWithContent('tr', 'header__row');
+  var headerNodes = headerElmList.map(elm =>
+    createElmWithContent('th', 'header__cell', elm)
+  );
+  headerNodes.forEach(elm => headerRow.appendChild(elm));
+  headerDeclaration.appendChild(headerRow);
+  return headerDeclaration;
+}
+
+function renderData(data, parentElm) {
+  // create text header for current table
+  parentElm.appendChild(
+    createElmWithContent('h2', 'table__text-header', 'Results of your choice')
+  );
+
+  // create table
+  var tableElm = parentElm.appendChild(createElmWithContent('table', 'table'));
+
+  // generate header and put it to storage
+  var header = renderHeader(['Product name', 'Clicks', 'Shown']);
+  var body = document.createElement('tbody');
+
+  // generate rows, put it to storage and append to parent element
+  var rows = [];
+  // add rows for each store
+  Object.keys(data).forEach(elm => {
+    var row = data[elm].renderProduct(parentElm);
+    body.appendChild(row);
+  });
+
+  // generate footer and put it to storage
+  tableElm.appendChild(header);
+  tableElm.appendChild(body);
+}
+//=======================================
+
 function handleClick(e) {
   var chosenPicture = e.target.dataset.imgFilename;
   products[getName(chosenPicture)].clicks += 1;
-  var productListForQuiz = chooseRandom(productsToShow, [], products);
-  var currentQuiz = new Quiz(productListForQuiz);
-  currentQuiz.addDomElm();
-  currentQuiz.render(app);
+  render();
 }
 
-var app = document.getElementById('appForm');
-app.addEventListener('input', handleClick);
+function showResult(products) {}
 
+function render() {
+  numberOfRounds -= 1;
+  if (numberOfRounds >= 0) {
+    var productListForQuiz = chooseRandom(productsToShow, [], products);
+    var currentQuiz = new Quiz(productListForQuiz);
+    currentQuiz.addDomElm();
+    currentQuiz.update(appForm);
+  } else {
+    appForm.removeEventListener('input', handleClick);
+    clearElm(appForm);
+    renderData(products, appTable);
+  }
+}
+
+var appForm = document.getElementById('appForm');
+var appTable = document.getElementById('appForm');
+appForm.addEventListener('input', handleClick);
 productsToAdd.forEach(elm => (products[getName(elm)] = new Product(elm)));
-var productListForQuiz = chooseRandom(productsToShow, [], products);
-var currentQuiz = new Quiz(productListForQuiz);
-currentQuiz.addDomElm();
-currentQuiz.render(app);
+
+render();
