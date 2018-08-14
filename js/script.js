@@ -16,6 +16,12 @@
 //   quiz
 //     .render()
 //     .updateView()
+//
+// Day 2
+// (UI) add a11n functionality to the page:
+//   check tab browsing;
+//   outline for selected element;
+// (engine) separate DOM elements creation from switching pictures;
 
 var productsToShow = 3;
 var numberOfRounds = 25;
@@ -77,40 +83,41 @@ function chooseRandom(productsToShow, skipList, products) {
   return result;
 }
 
-function Quiz(randomProducts) {
-  randomProducts.forEach(elm => {
-    this[elm.toString()] = elm;
-    products[elm.toString()].shown += 1;
-  });
-}
-
-Quiz.prototype.addDomElm = function addDom() {
-  Object.keys(this).forEach(productName => {
-    var product = this[productName];
+function addDom(arr) {
+  return arr.map(_ => {
     var input = document.createElement('input');
     var label = document.createElement('label');
     var img = document.createElement('img');
     input.type = 'radio';
     input.name = 'quizRadio';
-    input.id = productName;
     input.className = 'input  input__quiz';
-    input.dataset.imgFilename = product.filename;
-    label.for = input.id;
+    img.className = 'img form__img';
     label.className = 'label  label__quiz';
     label.appendChild(input);
-    img.src = `img/${product.filename}`;
-    img.className = 'img form__img';
     label.appendChild(img);
-    this[product.toString()].DOMElm = label;
+    return label;
   });
-};
+}
 
-Quiz.prototype.update = function initialRender(destination) {
-  clearElm(destination);
-  Object.keys(this).forEach(productName => {
-    destination.appendChild(this[productName].DOMElm);
+function updateQuiz(quizArr, valuesArr, destination) {
+  quizArr.forEach((elm, ndx) => {
+    Array.from(elm.children).forEach(nodeElm => {
+      var quizElm = valuesArr[ndx];
+      quizElm.shown += 1;
+      console.log(nodeElm.tagName);
+      if (nodeElm.tagName === 'INPUT') {
+        console.log(quizElm);
+        nodeElm.checked = false;
+        nodeElm.id = quizElm.name;
+        nodeElm.dataset.imgFilename = quizElm.filename;
+      } else if (nodeElm.tagName === 'IMG') {
+        nodeElm.src = `img/${quizElm.filename}`;
+        nodeElm.alt = `Picture of ${quizElm.name}`;
+      }
+    });
+    destination.appendChild(elm);
   });
-};
+}
 
 function clearElm(elm) {
   while (elm.firstChild) {
@@ -125,7 +132,7 @@ function createElmWithContent(elmName, elmClass, content) {
   return elm;
 }
 
-function renderProduct(target) {
+function renderProduct() {
   var row = createElmWithContent('tr', 'table__body  row');
   row.appendChild(createElmWithContent('th', 'header__cell', this.name));
   row.appendChild(createElmWithContent('td', 'body__cell', this.clicks));
@@ -157,8 +164,6 @@ function renderData(data, parentElm) {
   var header = renderHeader(['Product name', 'Clicks', 'Shown']);
   var body = document.createElement('tbody');
 
-  // generate rows, put it to storage and append to parent element
-  var rows = [];
   // add rows for each store
   Object.keys(data).forEach(elm => {
     var row = data[elm].renderProduct(parentElm);
@@ -177,15 +182,14 @@ function handleClick(e) {
   render();
 }
 
-function showResult(products) {}
-
 function render() {
   numberOfRounds -= 1;
   if (numberOfRounds >= 0) {
     var productListForQuiz = chooseRandom(productsToShow, [], products);
-    var currentQuiz = new Quiz(productListForQuiz);
-    currentQuiz.addDomElm();
-    currentQuiz.update(appForm);
+    // currentQuiz = currentQuiz || new Quiz(productListForQuiz);
+    // currentQuiz.addDomElm();
+    // currentQuiz.update(appForm);
+    updateQuiz(currentQuiz, productListForQuiz, appForm);
   } else {
     appForm.removeEventListener('input', handleClick);
     clearElm(appForm);
@@ -193,6 +197,8 @@ function render() {
   }
 }
 
+var currentQuiz = new Array(productsToShow).fill(0);
+currentQuiz = addDom(currentQuiz);
 var appForm = document.getElementById('appForm');
 var appTable = document.getElementById('appForm');
 appForm.addEventListener('input', handleClick);
