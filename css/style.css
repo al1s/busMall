@@ -25,6 +25,8 @@ body {
 }
 
 .form {
+  display: flex;
+  align-items: center;
   margin: 0 auto;
   width: 90%;
 }
@@ -35,6 +37,7 @@ body {
 }
 
 .label {
+  flex: 1 1 30%;
 }
 
 .img {
