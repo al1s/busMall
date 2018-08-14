@@ -96,8 +96,10 @@ Quiz.prototype.addDomElm = function addDom() {
     input.className = 'input  input__quiz';
     input.dataset.imgFilename = product.filename;
     label.for = input.id;
+    label.className = 'label  label__quiz';
     label.appendChild(input);
     img.src = `img/${product.filename}`;
+    img.className = 'img form__img';
     label.appendChild(img);
     this[product.toString()].DOMElm = label;
   });
@@ -115,7 +117,7 @@ function clearElm(elm) {
     elm.removeChild(elm.firstChild);
   }
 }
-//=======================================
+//================== Came from Salmon Cookies =====================
 function createElmWithContent(elmName, elmClass, content) {
   var elm = document.createElement(elmName);
   elm.className = elmClass;
