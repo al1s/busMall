@@ -1,6 +1,5 @@
 :root {
   --primary-color: #222222;
-  --secondary-color: #c993df;
   --neutral-color: #white;
 }
 
@@ -15,6 +14,7 @@ body {
 .notify__message {
   text-align: center;
 }
+
 .main {
   background-color: var(--secondary-color);
   display: grid;

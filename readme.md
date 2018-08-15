@@ -41,3 +41,9 @@ Also based on that value, ensure that your randomizer is properly handling the s
 Do today's work on a branch called chartjs.
 
 Using ChartJS, display your vote totals in a bar chart as instructed in the initial definition of the BusMall assignment. If you want to try some additional chart types, do so with some of your alternate data that you have calculated from your vote results. The size and look of your chart is up to you, just be sure to put it in the area beneath the three images. Hint: for this type of data, bar charts work well.
+
+## Day 3
+
+Do today's work on a branch called local-storage.
+
+Give your BusMall app some persistence by using local storage to store your voting data! The goal is to have all of your click data persist through a page refresh or through completely closing the browser.

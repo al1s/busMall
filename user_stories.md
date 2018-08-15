@@ -23,3 +23,7 @@ As a dev, I want the code be reusable, modular and easy to support, so that I wi
 ### Day 2
 
 As an user, I want to see results presented to me as a chart, so that I could quickly grasp the whole picture of the survey.
+
+### Day 3
+
+As a user, I want to keep my results for each session between sessions, so that I could quit the page and after return see my previous results were kept.

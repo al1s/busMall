@@ -183,6 +183,28 @@ function buildChart(data) {
 //   });
 // }
 
+function saveResult(oldData, newData) {
+  console.log({ oldData });
+  console.log({ newData });
+  if (oldData) {
+    oldData = JSON.parse(oldData);
+    Object.keys(newData).forEach(elm => {
+      newData[elm].shown += oldData[elm].shown;
+      newData[elm].clicks += oldData[elm].clicks;
+    });
+  }
+  localStorage.setItem('products', JSON.stringify(newData));
+}
+
+function populateData(productLikeData, products) {
+  var productLikeObj = JSON.parse(productLikeData);
+  Object.keys(productLikeObj).forEach(productName => {
+    products[productName] = Object.assign(
+      new Product(productLikeObj[productName].filename)
+    );
+  });
+}
+
 function handleClick(e) {
   var chosenPicture = e.target.dataset.imgFilename;
   products[getName(chosenPicture)].clicks += 1;
@@ -199,9 +221,9 @@ function render() {
     appForm.removeEventListener('input', handleClick);
     clearElm(appForm);
     notifyMsgElm.innerText = 'Results of your choice';
-    var dataForChart = mapData(products);
-    console.log(dataForChart);
-    buildChart(dataForChart);
+
+    saveResult(hasData, products);
+    buildChart(mapData(products));
   }
 }
 
@@ -211,9 +233,13 @@ currentQuiz = addDom(currentQuiz);
 var appForm = document.getElementById('appForm');
 var notifyMsgElm = document.getElementById('notifyMsg');
 var canvasContainer = document.querySelector('.canvas__wrapper');
-console.log(canvasContainer);
 appForm.addEventListener('input', handleClick);
-productsToAdd.forEach(elm => (products[getName(elm)] = new Product(elm)));
+var hasData = localStorage.getItem('products');
+if (!hasData) {
+  productsToAdd.forEach(elm => (products[getName(elm)] = new Product(elm)));
+} else {
+  populateData(hasData, products);
+}
 // test Charts
 // mockupProducts(products);
 
