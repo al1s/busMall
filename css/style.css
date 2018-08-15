@@ -11,7 +11,8 @@ body {
   font-size: 1rem;
 }
 
-.main__header {
+.main__header,
+.notify__message {
   text-align: center;
 }
 .main {
@@ -52,6 +53,11 @@ body {
 
 .table__text-header {
   text-align: center;
+}
+
+.canvas__wrapper {
+  margin: 0 auto;
+  width: 80vw;
 }
 
 @media screen and (min-width: 22rem) {

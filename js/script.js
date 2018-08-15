@@ -23,6 +23,7 @@
 //   outline for selected element;
 // (engine) separate DOM elements creation from switching pictures;
 
+// app vars
 var productsToShow = 3;
 var numberOfRounds = 25;
 var products = {};
@@ -49,6 +50,25 @@ var productsToAdd = [
   'wine-glass.jpg'
 ];
 
+// little helpers
+function getName(src) {
+  return src.split('.')[0];
+}
+
+function randomRange(arr) {
+  return Math.floor(Math.random() * arr.length);
+}
+
+function clearElm(elm) {
+  while (elm.firstChild) {
+    elm.removeChild(elm.firstChild);
+  }
+}
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
 function Product(filename) {
   this.name = getName(filename);
   this.filename = filename;
@@ -56,17 +76,9 @@ function Product(filename) {
   this.shown = 0;
 }
 
-function getName(src) {
-  return src.split('.')[0];
-}
 Product.prototype.toString = function productToString() {
   return this.name;
 };
-Product.prototype.renderProduct = renderProduct;
-
-function randomRange(arr) {
-  return Math.floor(Math.random() * arr.length);
-}
 
 function chooseRandom(productsToShow, skipList, products) {
   var arr = Object.keys(products);
@@ -84,7 +96,8 @@ function chooseRandom(productsToShow, skipList, products) {
 }
 
 function addDom(arr) {
-  return arr.map(_ => {
+  var result = [];
+  for (let i = 0; i < arr.length; i++) {
     var input = document.createElement('input');
     var label = document.createElement('label');
     var img = document.createElement('img');
@@ -95,8 +108,9 @@ function addDom(arr) {
     label.className = 'label  label__quiz';
     label.appendChild(input);
     label.appendChild(img);
-    return label;
-  });
+    result.push(label);
+  }
+  return result;
 }
 
 function updateQuiz(quizArr, valuesArr, destination) {
@@ -104,9 +118,7 @@ function updateQuiz(quizArr, valuesArr, destination) {
     Array.from(elm.children).forEach(nodeElm => {
       var quizElm = valuesArr[ndx];
       quizElm.shown += 1;
-      console.log(nodeElm.tagName);
       if (nodeElm.tagName === 'INPUT') {
-        console.log(quizElm);
         nodeElm.checked = false;
         nodeElm.id = quizElm.name;
         nodeElm.dataset.imgFilename = quizElm.filename;
@@ -119,62 +131,57 @@ function updateQuiz(quizArr, valuesArr, destination) {
   });
 }
 
-function clearElm(elm) {
-  while (elm.firstChild) {
-    elm.removeChild(elm.firstChild);
-  }
-}
-//================== Came from Salmon Cookies =====================
-function createElmWithContent(elmName, elmClass, content) {
-  var elm = document.createElement(elmName);
-  elm.className = elmClass;
-  elm.textContent = content;
-  return elm;
-}
+function mapData(dataInput) {
+  var data = Object.keys(dataInput)
+    .sort((a, b) => dataInput[b].shown - dataInput[a].shown)
+    .reduce(
+      (result, elm) => {
+        result.datasets[0].data.push(dataInput[elm].shown);
+        result.datasets[1].data.push(dataInput[elm].clicks);
+        result.labels.push(capitalize(elm));
+        return result;
+      },
+      { labels: [], datasets: [{ data: [] }, { data: [] }] }
+    );
+  data.datasets[0].label = 'Shown';
+  data.datasets[0].backgroundColor = 'rgba(200,0,0,0.2)';
+  data.datasets[1].label = 'Clicked';
+  data.datasets[1].backgroundColor = 'rgba(0,0,200,0.2)';
 
-function renderProduct() {
-  var row = createElmWithContent('tr', 'table__body  row');
-  row.appendChild(createElmWithContent('th', 'header__cell', this.name));
-  row.appendChild(createElmWithContent('td', 'body__cell', this.clicks));
-  row.appendChild(createElmWithContent('td', 'body__cell', this.shown));
-  return row;
-}
-
-function renderHeader(headerElmList) {
-  var headerDeclaration = createElmWithContent('thead', 'table__header');
-  var headerRow = createElmWithContent('tr', 'header__row');
-  var headerNodes = headerElmList.map(elm =>
-    createElmWithContent('th', 'header__cell', elm)
-  );
-  headerNodes.forEach(elm => headerRow.appendChild(elm));
-  headerDeclaration.appendChild(headerRow);
-  return headerDeclaration;
+  return data;
 }
 
-function renderData(data, parentElm) {
-  // create text header for current table
-  parentElm.appendChild(
-    createElmWithContent('h2', 'table__text-header', 'Results of your choice')
-  );
+function buildChart(data) {
+  var chartBar = document.createElement('canvas');
+  canvasContainer.appendChild(chartBar);
 
-  // create table
-  var tableElm = parentElm.appendChild(createElmWithContent('table', 'table'));
+  var options = {
+    scales: {
+      xAxes: [{ stacked: true }],
+      yAxes: [
+        {
+          stacked: false,
+          ticks: { beginAtZero: true }
+        }
+      ]
+    }
+  };
 
-  // generate header and put it to storage
-  var header = renderHeader(['Product name', 'Clicks', 'Shown']);
-  var body = document.createElement('tbody');
-
-  // add rows for each store
-  Object.keys(data).forEach(elm => {
-    var row = data[elm].renderProduct(parentElm);
-    body.appendChild(row);
+  new Chart(chartBar.getContext('2d'), {
+    type: 'bar',
+    data,
+    options
   });
-
-  // generate footer and put it to storage
-  tableElm.appendChild(header);
-  tableElm.appendChild(body);
 }
-//=======================================
+
+// function mockupProducts(products) {
+//   numberOfRounds = 0;
+//   Object.keys(products).forEach(elm => {
+//     var rNum = Math.floor(Math.random() * 20);
+//     products[elm].shown = rNum;
+//     products[elm].clicks = Math.floor(rNum / Math.floor(Math.random() * 2));
+//   });
+// }
 
 function handleClick(e) {
   var chosenPicture = e.target.dataset.imgFilename;
@@ -186,22 +193,28 @@ function render() {
   numberOfRounds -= 1;
   if (numberOfRounds >= 0) {
     var productListForQuiz = chooseRandom(productsToShow, [], products);
-    // currentQuiz = currentQuiz || new Quiz(productListForQuiz);
-    // currentQuiz.addDomElm();
-    // currentQuiz.update(appForm);
     updateQuiz(currentQuiz, productListForQuiz, appForm);
+    notifyMsgElm.innerText = `${numberOfRounds + 1} rounds left.`;
   } else {
     appForm.removeEventListener('input', handleClick);
     clearElm(appForm);
-    renderData(products, appTable);
+    notifyMsgElm.innerText = 'Results of your choice';
+    var dataForChart = mapData(products);
+    console.log(dataForChart);
+    buildChart(dataForChart);
   }
 }
 
+// main
 var currentQuiz = new Array(productsToShow).fill(0);
 currentQuiz = addDom(currentQuiz);
 var appForm = document.getElementById('appForm');
-var appTable = document.getElementById('appForm');
+var notifyMsgElm = document.getElementById('notifyMsg');
+var canvasContainer = document.querySelector('.canvas__wrapper');
+console.log(canvasContainer);
 appForm.addEventListener('input', handleClick);
 productsToAdd.forEach(elm => (products[getName(elm)] = new Product(elm)));
+// test Charts
+// mockupProducts(products);
 
 render();
