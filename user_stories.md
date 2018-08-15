@@ -2,6 +2,8 @@
 
 ## User Stories
 
+### Day 1
+
 As a market analyst, I want to see users preferences for our product list, so that I will put correct priorities for the future project development.
 
 As an analyst, I want to provide the user with only 3 choices per selection round, so that the user will make his choice without any difficulty.
@@ -17,3 +19,7 @@ As a user, I want to see pictures of different product in different combinations
 As a user, I want eventually see the result of my choice, so that I will learn my preferences a little dipper.
 
 As a dev, I want the code be reusable, modular and easy to support, so that I will need a little efforts to modify and align it to new requirements.
+
+### Day 2
+
+As an user, I want to see results presented to me as a chart, so that I could quickly grasp the whole picture of the survey.
