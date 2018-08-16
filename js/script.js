@@ -184,8 +184,6 @@ function buildChart(data) {
 // }
 
 function saveResult(oldData, newData) {
-  console.log({ oldData });
-  console.log({ newData });
   if (oldData) {
     oldData = JSON.parse(oldData);
     Object.keys(newData).forEach(elm => {
@@ -214,7 +212,7 @@ function handleClick(e) {
 function render() {
   numberOfRounds -= 1;
   if (numberOfRounds >= 0) {
-    var productListForQuiz = chooseRandom(productsToShow, [], products);
+    productListForQuiz = chooseRandom(productsToShow, productListForQuiz.map(elm => elm.toString()), products);
     updateQuiz(currentQuiz, productListForQuiz, appForm);
     notifyMsgElm.innerText = `${numberOfRounds + 1} rounds left.`;
   } else {
@@ -228,6 +226,7 @@ function render() {
 }
 
 // main
+var productListForQuiz = [];
 var currentQuiz = new Array(productsToShow).fill(0);
 currentQuiz = addDom(currentQuiz);
 var appForm = document.getElementById('appForm');
